@@ -28,11 +28,11 @@ class Bot(object):
         self.s = _socket.socket()
 
         # Define constants for class
-        self.nick = "justbottedyou"
-        self.realid = "justbottedyou"
-        self.irc = "irc.twitch.tv"
-        self.port = 6667
-        self.passw = "oauth:dzp8ts6z6t1c5ezf1wkjmky5gsf3qc"
+        self.nick = settings.config['username']
+        self.realid = settings.config['username']
+        self.irc = settings.config['server']
+        self.port = settings.config['port']
+        self.passw = settings.config['password']
         self.readBuffer = ""
 
     #=======================================================
@@ -89,6 +89,7 @@ class Bot(object):
             if len(buffer) == 0:
                 print("Bot has been disconnected. Attempting to reconnect...")
                 self.s.send("QUIT \r\n".encode())
+                self.s.close()
                 self.connect()
 
             # Check for ping and reply with pong
