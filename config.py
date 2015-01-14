@@ -14,17 +14,16 @@ config = {
 
     # Customized settings for bot
     'channel': '#channelname',
-    'motd': 'Message of the day.',
     'joinmessage': 'JPUBot has joined the channel',
 
     # Commands that bot can use
     'commands': {
         '!addcom': 'addcom',
-        '!minik': 'tfw no turbo T-T',
+        '!motd': 'Message of the day.',
         '!test': 'Test command received.'
+        
+        # Custom commands added below
     }
-    # End of commands
-
 
     #FIXME: Add more settings to config
 }
