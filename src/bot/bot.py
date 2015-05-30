@@ -7,9 +7,11 @@
 """
 
 import _socket
-import config as settings   #Change folder location to config.config
-import commands
 import re
+from time import sleep
+
+from src.bot import commands as commands
+from src.bot import config as settings
 
 
 class Bot(object):
@@ -72,8 +74,11 @@ class Bot(object):
     #       None.
     #===================================================================
     def disconnect(self):
+        # Try sleeping for 1 second
+
         # FIXME: If left idle for extended period of time disconnect message is not printed
         self.s.send(("PRIVMSG %s :%s.\r\n" % (self.channel, settings.config['leavemessage'])).encode())
+        sleep(5)
         self.s.send("QUIT \r\n".encode())
         exit(0)
 
@@ -259,6 +264,16 @@ class Bot(object):
                     if self.determineUser(buffer) == settings.config['channel'].strip("#"):
                         # Disconnect from irc server
                         self.disconnect()
+                elif com == 'song':
+                    # Get the song name from the text file
+                    songdata = c.song()
+
+                    # Check that it was opened successfully
+                    if songdata is not None:
+                        self.s.send(("PRIVMSG %s :/me Song: %s\r\n" % (self.channel, songdata)).encode())
+                        print("[CONSOLE] Sending song name (%s) to server." % songdata)
+                    else:
+                        print("[CONSOLE] Song data could not be found.")
 
                 else:   # Doesn't require function call so print command
                     self.s.send(("PRIVMSG %s :%s\r\n" % (self.channel, com)).encode())

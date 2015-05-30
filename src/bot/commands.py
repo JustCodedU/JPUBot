@@ -6,9 +6,10 @@
 """
 
 # Imports
-import config as settings
 import importlib
 import re
+import os
+from src.bot import config as settings
 
 
 class Command(object):
@@ -23,6 +24,7 @@ class Command(object):
     def __init__(self, data):
         self.data = data
         self.matches = settings.config['commands']
+        self.scoms = settings.config['songcommands']
 
     #==========================================================
     # Checks for match in buffer to an existing command stored
@@ -90,8 +92,8 @@ class Command(object):
         # Command is not there
         return False
 
-    #==========================================================
-    # Attempts to add the command into the commands dictionary
+    #====================================================================
+    # !addcom - Attempts to add the command into the commands dictionary
     # inside the config file with the value passed in val.
     #     Input:
     #         com - Command to add in dictionary.
@@ -99,10 +101,10 @@ class Command(object):
     #     Output:
     #         boolean - Returns True command was added.
     #                 - Returns False if command was not added.
-    #===========================================================
+    #=====================================================================
     def addCom(self, com, val):
         # Open the config file and find line with commands
-        with open('config.py', 'r') as file:
+        with open('src/config.py', 'r') as file:
             data = file.readlines()
 
         # Debug information
@@ -128,7 +130,7 @@ class Command(object):
         print(data)
 
         # Write changes to file
-        with open('config.py', 'w') as file:
+        with open('src/config.py', 'w') as file:
             file.write("".join(data))
 
         # Print result
@@ -137,7 +139,7 @@ class Command(object):
         return True
 
     #===========================================================
-    # Attempts to remove the command from the commands
+    # !remcom - Attempts to remove the command from the commands
     # dictionary inside the config file.
     #     Input:
     #         com - Command to remove from dictionary.
@@ -147,7 +149,7 @@ class Command(object):
     #============================================================
     def remCom(self, com):
         # Open the config file and find line with commands
-        with open('config.py', 'r') as file:
+        with open('src/config.py', 'r') as file:
             data = file.readlines()
 
         # Debug information
@@ -170,10 +172,79 @@ class Command(object):
         print(data)
 
         # Write the new data back into the file
-        with open('config.py', 'w') as file:
+        with open('src/config.py', 'w') as file:
             file.write("".join(data))
 
         # Print the result to the console
         print("[CONSOLE] Command has been removed.")
 
         return True
+
+    #=============================================================
+    # Returns value at line index in the text file pointed to
+    # by the path variable.
+    #     Input:
+    #         index - index to retrieve information from.
+    #         path - path to the file to find data from.
+    #     Output:
+    #         string - Contents of line in file pointed to by path.
+    #==============================================================
+    def getTextLine(self, index, path):
+        # Set data to none by default
+        data = None
+
+        # Check if the file is accessible
+        if not os.path.exists(path):
+            print("[CONSOLE] ERROR: Cannot open file at path.")
+            return None
+
+        # Try to read text file and return the value of the last line in the file
+        try:
+            with open(path, 'r') as file:
+                data = file.readline(index)
+        except IOError:
+            print("[CONSOLE] ERROR: Error when opening file. Check if file is readable.")
+        finally:
+            return data
+
+    #============================================================
+    # !song - Prints song that is stored in text file at location
+    # given inside the config file. If not set the command
+    # displays the error to console.
+    #     Input:
+    #         None.
+    #     Output:
+    #         string - Contents of latest line in songpath file.
+    #=============================================================
+    def song(self):
+        # Check if command is enabled
+        if not self.scoms['songenabled']:
+            print("[CONSOLE] !song detected, but command is not enabled.")
+            return None
+
+        # Store the path of the song text file
+        songpath = self.scoms['songpath']
+
+        return self.getTextLine(-1, songpath)
+
+    #============================================================
+    # !lastsong - Prints previous song name at index passed
+    # that is stored in text file at location given inside
+    # the config file. If not set the command displays the
+    # error to console.
+    #     Input:
+    #         index - distance from bottom of text file (from
+    #                 last song).
+    #     Output:
+    #         string - Contents of latest line in songpath file.
+    #=============================================================
+    def lastsong(self, index):
+        # Check of command is enabled
+        if not self.scoms['lastsongenabled']:
+            print("[CONSOLE] !lastsong detected, but command is not enabled.")
+            return None
+
+        # Store the path of the song text file
+        songpath = self.scoms['songpath']
+
+        return self.getTextLine(index * -1, songpath)
