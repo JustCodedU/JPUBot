@@ -9,8 +9,8 @@ config = {
     # Basic bot configurations needed to log into irc server
     'server': 'irc.twitch.tv',
     'port': 6667,
-    'username': 'justbottedyou',
-    'password': 'oauth:x3oaonl2iao3elfow6vbly4jz045d5',
+    'username': 'username',
+    'password': 'oauth',
 
     # Customized settings for bot
     'channel': '#justpwnedu',
@@ -34,7 +34,7 @@ config = {
 
     # File properties
     'properties': {
-        'songpath': 'C:\\Users\\Admin\\Desktop\\Stream\\np.txt',
+        'songpath': 'path to file',
     },
 
     # Command values

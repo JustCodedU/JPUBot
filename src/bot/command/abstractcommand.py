@@ -15,7 +15,13 @@ class AbstractCommand:
     command = ""
 
     def __init__(self):
-        pass
+        # For the new instance reload the config file
+        importlib.reload(BotSettings)
+
+        #Load the configs
+        self.commandList = BotSettings.config['commands']
+        self.propertyList = BotSettings.config['properties']
+        self.valueList = BotSettings.config['values']
 
     """
         Execute method for the command. Executes what should happen during the command.
@@ -36,7 +42,7 @@ class AbstractCommand:
             return True
 
         # Otherwise check the user's access level
-        if user.getModAccess == self.modOnlyAccess:
+        if user.modAccess == self.modOnlyAccess:
             return True
         else:
             return False
