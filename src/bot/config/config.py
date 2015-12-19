@@ -9,8 +9,8 @@ config = {
     # Basic bot configurations needed to log into irc server
     'server': 'irc.twitch.tv',
     'port': 6667,
-    'username': 'justbottedyou',
-    'oauthcode': 'oauth:4v9o783glqpf5kqjjyz8h347fxea04',
+    'username': '<USER_NAME_HERE>',
+    'oauthcode': '<OAUTH_CODE_HERE>',
 
     # Customized settings for bot
     'channel': '#justpwnedu',
