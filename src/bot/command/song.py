@@ -1,4 +1,4 @@
-from src.bot.command.abstractcommand import AbstractCommand
+from src.bot.command.commander import AbstractCommand
 
 class Song(AbstractCommand):
     """
@@ -28,18 +28,22 @@ class Song(AbstractCommand):
 
         self.logger.info("Command detected: {}, sending message...".format(self.command))
 
-        if self.checkIfEnabled():
-            if self.checkIfAllowed(user):
-                if self.readSongPath() is not None:
-                    self.messenger.setMessage(self.getTextLine(-1, self.readSongPath()))
-                    self.messenger.sendMeMessage()
-                    self.logger.info("User {} executed {} command.".format(user.userName, self.command))
-                else:
-                    self.logger.error("Could not find value for {} command".format(self.command))
-            else:
-                self.logger.info("User {} does not have permission to run command.".format(user.userName))
-        else:
+        # Check that the command is enabled
+        if not self.checkIfEnabled():
             self.logger.info("Command not enabled")
+            return
+
+        # Check the user permissions
+        if not self.checkIfAllowed(user):
+            self.logger.info("User {} does not have permission to run command.".format(user.userName))
+            return
+
+        # Attempt to get the file path that stores the current song and send the last line of the file
+        if self.readSongPath() is not None:
+            self.messenger.sendMeMessage(self.getTextLine(-1, self.readSongPath()))
+            self.logger.info("User {} executed {} command.".format(user.userName, self.command))
+        else:
+            self.logger.error("Could not find value for {} command".format(self.command))
 
     def readSongPath(self):
         """

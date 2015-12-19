@@ -1,7 +1,6 @@
 from functools import reduce
 import logging
 from time import clock
-from sys import stdout
 
 class User:
 
@@ -20,15 +19,7 @@ class User:
         self.joinTime = clock()
 
         # Load logger instance
-        logger = logging.getLogger("LOG")
-
-        # TODO this needs to be pulled into a better place
-        logger.setLevel(logging.INFO)
-        handler = logging.StreamHandler(stdout)
-        formatter = logging.Formatter('(%(asctime)s) [%(levelname)s]: %(message)s')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        self.logger = logger
+        self.logger = logging.getLogger("LOG")
 
     def getConnectedTime(self):
         """

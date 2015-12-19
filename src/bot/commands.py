@@ -17,18 +17,18 @@ class Command(object):
     #=======================================================
     # Constructor for command object.
     #     Input:
-    #         data - Buffer to search for commands in.
+    #         data - Buffer to search for commands.py in.
     #     Output:
     #         None.
     #=======================================================
     def __init__(self, data):
         self.data = data
-        self.matches = settings.config['commands']
+        self.matches = settings.config['commands.py']
         self.scoms = settings.config['songcommands']
 
     #==========================================================
     # Checks for match in buffer to an existing command stored
-    # in the config file commands.
+    # in the config file commands.py.
     #     Input:
     #         None.
     #     Output:
@@ -45,17 +45,17 @@ class Command(object):
 
     #==========================================================
     # Isolates command from buffer and searches for the
-    # matching return message in the commands dictionary.
+    # matching return message in the commands.py dictionary.
     #     Input:
     #         None.
     #     Output:
-    #         string - value from commands dictionary for
+    #         string - value from commands.py dictionary for
     #                  command.
     #===========================================================
     def findCommand(self):
-        # Reload the command file to check for new commands
+        # Reload the command file to check for new commands.py
         importlib.reload(settings)
-        self.matches = settings.config['commands']
+        self.matches = settings.config['commands.py']
 
         # Debug information
         print("[DEBUG] Commands: %s" % self.matches)
@@ -93,7 +93,7 @@ class Command(object):
         return False
 
     #====================================================================
-    # !addcom - Attempts to add the command into the commands dictionary
+    # !addcom - Attempts to add the command into the commands.py dictionary
     # inside the config file with the value passed in val.
     #     Input:
     #         com - Command to add in dictionary.
@@ -103,7 +103,7 @@ class Command(object):
     #                 - Returns False if command was not added.
     #=====================================================================
     def addCom(self, com, val):
-        # Open the config file and find line with commands
+        # Open the config file and find line with commands.py
         with open('src/config.py', 'r') as file:
             data = file.readlines()
 
@@ -122,7 +122,7 @@ class Command(object):
 
         # Find the correct spot to add the command and add it there
         for i in range(0, len(data) - 1):
-            if "# Custom commands added below" in data[i]:
+            if "# Custom commands.py added below" in data[i]:
                 data.insert(i + 1, com + "\n")
 
         # Debug information
@@ -139,7 +139,7 @@ class Command(object):
         return True
 
     #===========================================================
-    # !remcom - Attempts to remove the command from the commands
+    # !remcom - Attempts to remove the command from the commands.py
     # dictionary inside the config file.
     #     Input:
     #         com - Command to remove from dictionary.
@@ -148,7 +148,7 @@ class Command(object):
     #                 - Returns False if command was not deleted.
     #============================================================
     def remCom(self, com):
-        # Open the config file and find line with commands
+        # Open the config file and find line with commands.py
         with open('src/config.py', 'r') as file:
             data = file.readlines()
 

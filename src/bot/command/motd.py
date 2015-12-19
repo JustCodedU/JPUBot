@@ -1,4 +1,6 @@
-from src.bot.command.abstractcommand import AbstractCommand
+from src.bot.command.commander import AbstractCommand
+from src.bot.command.disconnect import Disconnect
+
 
 class Motd(AbstractCommand):
     """
@@ -30,8 +32,7 @@ class Motd(AbstractCommand):
         if self.checkIfEnabled():
             if self.checkIfAllowed(user):
                 if self.readMotdValue() is not None:
-                    self.messenger.setMessage(self.readMotdValue())
-                    self.messenger.sendMessage()
+                    self.messenger.sendMessage(self.readMotdValue())
                     self.logger.info("User {} executed {} command.".format(user.userName, self.command))
                 else:
                     self.logger.error("Could not find value for {} command".format(self.command))

@@ -1,8 +1,46 @@
 from abc import abstractmethod, ABCMeta
+import re
 import src.bot.config.config as BotSettings
 import importlib
 import os
 import logging
+from src.bot.messaging.messenger import MessageConstants
+
+class CommandRunner:
+
+    def __init__(self, messenger, user_tracker):
+        self.logger = logging.getLogger("LOG")
+        self.user_tracker = user_tracker
+        self.messenger = messenger
+
+    def findAndExecute(self, buffer):
+        importlib.reload(BotSettings)
+        commands = BotSettings.config['commands']
+        mappings = BotSettings.config['mappings']
+        lines = str.split(buffer, "\n")
+
+        for line in lines:
+            if MessageConstants.PRIV_MSG() in line:
+                command = self.findCommand(line)
+                user = self.user_tracker.returnUser(line)
+
+                if command not in commands:
+                    return
+                module = __import__("src.bot.command." + mappings[command].lower())
+                module = getattr(module, "bot")
+                module = getattr(module, "command")
+                module = getattr(module, mappings[command].lower())
+                module = getattr(module, mappings[command])
+                instance = module(self.messenger)
+
+                if instance is not None and issubclass(type(instance), AbstractCommand):
+                    instance.execute(user)
+
+    def findCommand(self, line):
+        lines = str.split(line, " ")
+        return re.sub(':', '', lines[3]).strip()
+
+
 
 class AbstractCommand:
     """

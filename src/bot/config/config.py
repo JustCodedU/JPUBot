@@ -9,11 +9,11 @@ config = {
     # Basic bot configurations needed to log into irc server
     'server': 'irc.twitch.tv',
     'port': 6667,
-    'username': '<USER_NAME_HERE>',
-    'oauthcode': '<OAUTH_CODE_HERE>',
+    'username': '<TWITCH_USER_NAME>',
+    'oauthcode': '<TWITCH_OAUTH_PASSKEY>',
 
     # Customized settings for bot
-    'channel': '#justpwnedu',
+    'channel': '#<CHANNEL_NAME>',
     'joinmessage': 'JPUBot has joined the channel.',
     'leavemessage': 'JPUBot Disconnecting from channel.',
 
@@ -34,12 +34,18 @@ config = {
 
     # File properties
     'properties': {
-        'songpath': 'C:\\Users\\Admin\\Desktop\\Stream\\np.txt',
+        'songpath': '<PATH_TO_SONG_FILE>',
     },
 
     # Command values
     'values': {
         'motdvalue': 'Welcome to the channel!',
+    },
+
+    # Command class mappings
+    'mappings': {
+        '!motd': 'Motd',
+        '!song': 'Song',
     }
 }
 

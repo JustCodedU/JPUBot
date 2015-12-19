@@ -39,8 +39,9 @@ class UserTracker(object):
             return
 
         # Else add user to tracking list
-        self.userList[user.userName] = user
-        self.logger.info("User: {} added to connected users.".format(user.userName))
+        if user.userName not in self.userList.keys():
+            self.userList[user.userName] = user
+            self.logger.info("User: {} added to connected users.".format(user.userName))
 
     def deRegisterUser(self, user):
         """
@@ -79,6 +80,25 @@ class UserTracker(object):
 
         # Return the first set of characters
         return line.split(" ")[0]
+
+    def returnUser(self, line):
+        """
+        returnUser(string) -> User
+
+        Takes a message from the IRC buffer and returns the user from the
+        user list that corresponds to it.
+        """
+
+        # Split the line by spaces and isolate username
+        lines = str.split(line, " ")
+        user_name = re.sub('!.*$', '', lines[0]).replace(":", "").strip()
+
+        # Get the user from the user list, if it doesn't exist create it
+        user = User(user_name)
+        self.registerUser(user)
+        user = self.userList[user_name]
+
+        return user
 
     def findUser(self, buffer):
         """

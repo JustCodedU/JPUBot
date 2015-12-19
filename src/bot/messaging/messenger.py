@@ -7,7 +7,7 @@ from src.bot.config.config import config as BotSettings
 from time import sleep
 from src.bot.exception.exceptions import *
 
-class _MessageConstants(object):
+class MessageConstants(object):
     """
     Helper class that holds constants for messaging through the IRC.
 
@@ -47,6 +47,10 @@ class _MessageConstants(object):
     def IRC_PORT():
         return BotSettings["port"]
 
+    @staticmethod
+    def PRIV_MSG():
+        return "PRIVMSG"
+
 class SocketHandler(object):
     """
     Class holds the socket instance and handles the connection to the IRC server and channel.
@@ -71,7 +75,7 @@ class SocketHandler(object):
         resetSocket()
 
         Resets the current instance of the socket. This will close the socket and the socket will need to be
-        reconnected to the channel before sending messages/commands.
+        reconnected to the channel before sending messages/commands.py.
         """
 
         self.socket = socket()
@@ -86,14 +90,14 @@ class SocketHandler(object):
 
         self.logger.info("Attempting to connect to IRC server...")
         try:
-            self.socket.connect((_MessageConstants.IRC_ADDRESS(), _MessageConstants.IRC_PORT()))
+            self.socket.connect((MessageConstants.IRC_ADDRESS(), MessageConstants.IRC_PORT()))
             self.logger.info("Connection successful!")
 
         except gaierror:
-            self.logger.error("Could not lookup address {}".format(_MessageConstants.IRC_ADDRESS()))
+            self.logger.error("Could not lookup address {}".format(MessageConstants.IRC_ADDRESS()))
 
         except OverflowError:
-            self.logger.error("Port {} invalid! Must be 0-65535".format(_MessageConstants.IRC_PORT()))
+            self.logger.error("Port {} invalid! Must be 0-65535".format(MessageConstants.IRC_PORT()))
 
         except TimeoutError:
             self.logger.error("Connection to server timed out. Could not establish connection")
@@ -111,11 +115,11 @@ class SocketHandler(object):
 
         self.logger.info("Attempting to login to IRC server...")
         try:
-            self.socket.send(("PASS %s\r\n" % _MessageConstants.OAUTH()).encode())
-            self.socket.send(("NICK %s\r\n" % _MessageConstants.USERNAME()).encode())
-            self.socket.send(("USER %s %s BOT :%s\r\n" % (_MessageConstants.USERNAME(),
-                                                          _MessageConstants.IRC_ADDRESS(),
-                                                          _MessageConstants.OAUTH())).encode())
+            self.socket.send(("PASS %s\r\n" % MessageConstants.OAUTH()).encode())
+            self.socket.send(("NICK %s\r\n" % MessageConstants.USERNAME()).encode())
+            self.socket.send(("USER %s %s BOT :%s\r\n" % (MessageConstants.USERNAME(),
+                                                          MessageConstants.IRC_ADDRESS(),
+                                                          MessageConstants.OAUTH())).encode())
             self.logger.info("Login Successful!")
 
         except TimeoutError:
@@ -132,15 +136,15 @@ class SocketHandler(object):
         as logging errors.
         """
 
-        self.logger.info("Attempting to join channel {}...".format(_MessageConstants.CHANNEL()))
+        self.logger.info("Attempting to join channel {}...".format(MessageConstants.CHANNEL()))
         try:
-            self.socket.send(("JOIN %s\r\n" % _MessageConstants.CHANNEL()).encode())
-            message = IRCMessenger(BotSettings["joinmessage"])
-            message.sendMessage()
+            self.socket.send(("JOIN %s\r\n" % MessageConstants.CHANNEL()).encode())
+            message = IRCMessenger(self)
+            message.sendMessage(BotSettings["joinmessage"])
 
             # TODO this needs to get implemented
             # self.socketHandler.socket.send(("CAP REQ :twitch.tv/membership").encode())
-            self.logger.info("Joined channel {} !".format(_MessageConstants.CHANNEL()))
+            self.logger.info("Joined channel {} !".format(MessageConstants.CHANNEL()))
 
         except TimeoutError:
             self.logger.error("Connection to server timed out.")
@@ -160,8 +164,8 @@ class SocketHandler(object):
         error_code = 0
 
         try:
-            mes = IRCMessenger(BotSettings['leavemessage'])
-            mes.sendMessage()
+            mes = IRCMessenger()
+            mes.sendMessage(BotSettings['leavemessage'])
             self.logger.info("Closing socket...")
             sleep(5)
             self.socket.send("QUIT \r\n".encode())
@@ -195,71 +199,46 @@ class IRCMessenger(object):
     @Author N McCallum
     """
 
-    def __init__(self, message=""):
-        self.message = message
-        self.socketHandler = SocketHandler()
+    def __init__(self, socketHandler):
+        self.socketHandler = socketHandler
 
         # Load logger instance
         self.logger = logging.getLogger("LOG")
 
-    def setMessage(self, message):
+    def sendMessage(self, message):
         """
-        setMessage(str)
-
-        Sets the message instance variable to the string provided in the method call.
-        """
-
-        if type(message) == str:
-            self.message = message
-        else:
-            self.logger.error("Can't set message because not string")
-
-    def sendMessage(self):
-        """
-        sendMessage()
+        sendMessage(str)
 
         Attempts to send the message in the message instance variable as a private message to the IRC server channel
         using the socketHandler() instance.
         """
 
         try:
-            self.socketHandler.socket.send(("%s %s\r\n" % (_MessageConstants.MESSAGE(), self.message)).encode())
-            # reader = IRCListener()
-            # data = reader.readChat()
-
-            # if self.message not in data:
-            #     raise MessageError("Message could not be sent to server: " + self.message)
-
-            self.logger.info("Message Sent: {}".format(self.message))
+            self.socketHandler.socket.send(("%s %s\r\n" % (MessageConstants.MESSAGE(), message)).encode())
+            self.logger.info("Message Sent: {}".format(message))
 
         except MessageError as e:
             self.logger.error("Error trying to send message: {}".format(e))
 
         except OSError as e:
-            self.logger.error("OS Error occurred trying to send message \"{}\": {}".format(self.message, e))
+            self.logger.error("OS Error occurred trying to send message \"{}\": {}".format(message, e))
 
-    def sendMeMessage(self):
+    def sendMeMessage(self, message):
         """
-        sendMeMessage()
+        sendMeMessage(str)
 
         Attempts to send the message in the message instance variable as a private message to the IRC server channel
         using the socketHandler() instance. Text will appear coloured on the twitch chat channel.
         """
         try:
-            self.socketHandler.socket.send(("%s/me %s\r\n" % (_MessageConstants.MESSAGE(), self.message)).encode())
-            # reader = IRCListener()
-            # data = reader.readChat()
-
-            # if self.message not in data:
-            #     raise MessageError("Me message could not be send to server: " + self.message)
-
-            self.logger.info("Me Message Sent: {}".format(self.message))
+            self.socketHandler.socket.send(("%s/me %s\r\n" % (MessageConstants.MESSAGE(), message)).encode())
+            self.logger.info("Me Message Sent: {}".format(message))
 
         except MessageError as e:
             self.logger.error("Error trying to send me message: {}".format(e))
 
         except OSError as e:
-            self.logger.error("OS Error occurred trying to send me message \"{}\": {}".format(self.message, e))
+            self.logger.error("OS Error occurred trying to send me message \"{}\": {}".format(message, e))
 
 
 class IRCListener(object):
@@ -276,9 +255,9 @@ class IRCListener(object):
 
     buffer = ""
 
-    def __init__(self, bufferSize=1024):
+    def __init__(self, socketHandler, bufferSize=1024):
         self.bufferSize = bufferSize
-        self.socketHandler = SocketHandler()
+        self.socketHandler = socketHandler
 
         # Load logger instance
         self.logger = logging.getLogger("LOG")
@@ -306,6 +285,12 @@ class IRCListener(object):
             data = data.rstrip()
 
             self.buffer += data + "\n"
+
+            # Check for ping and reply with pong
+            if "PING" in data:
+                self.logger.info("Ping command detected. Sending pong...")
+                self.socketHandler.socket.send("PONG".encode())
+
             return data
 
         except OSError as exception:
