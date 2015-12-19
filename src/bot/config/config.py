@@ -9,13 +9,13 @@ config = {
     # Basic bot configurations needed to log into irc server
     'server': 'irc.twitch.tv',
     'port': 6667,
-    'username': 'username',
-    'password': 'oauth',
+    'username': 'justbottedyou',
+    'oauthcode': 'oauth:4v9o783glqpf5kqjjyz8h347fxea04',
 
     # Customized settings for bot
     'channel': '#justpwnedu',
-    'joinmessage': 'JPUBot has joined the channel',
-    'leavemessage': 'JPUBot Disconnecting from channel',
+    'joinmessage': 'JPUBot has joined the channel.',
+    'leavemessage': 'JPUBot Disconnecting from channel.',
 
     # Console output settings
     'debug': False,
@@ -34,7 +34,7 @@ config = {
 
     # File properties
     'properties': {
-        'songpath': 'path to file',
+        'songpath': 'C:\\Users\\Admin\\Desktop\\Stream\\np.txt',
     },
 
     # Command values

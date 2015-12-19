@@ -1,16 +1,16 @@
-"""
-    Class to register users that are connected to the channel.
-    Class holds the values to give connected time and access level.
-
-    @Author N McCallum
-"""
-
 from functools import reduce
 import logging
 from time import clock
 from sys import stdout
 
 class User:
+
+    """
+    Class to register users that are connected to the channel.
+    Class holds the values to give connected time and access level.
+
+    @Author N McCallum
+    """
 
     def __init__(self, userName, modAccess=False):
         self.userName = userName
@@ -30,33 +30,36 @@ class User:
         logger.addHandler(handler)
         self.logger = logger
 
-    """
+    def getConnectedTime(self):
+        """
         getConnectedTime() -> floating point
 
         Returns floating point number of connected time in seconds.
-    """
-    def getConnectedTime(self):
+        """
+
         return clock() - self.joinTime
 
-    """
+    def getConnectedTimeString(self):
+        """
         getConnectedTimeString() -> string
 
         Returns formatted string of user time connected to channel.
         Format: hh:mm:ss
-    """
-    def getConnectedTimeString(self):
+        """
+
         connectedTime = self.getConnectedTime()
 
         return "%02d:%02d:%02d" % \
             reduce(lambda a, b: divmod(a[0], b) + a[1:], [(round(connectedTime),), 60, 60])
 
-    """
+    def setModAccess(self, modAccess):
+        """
         setModAccess(boolean)
 
         Sets the access level of the user to the boolean passed. Represents if user
         has access to moderator.
-    """
-    def setModAccess(self, modAccess):
+        """
+
         self.logger.info("User [%s] mod access set to: " + str(modAccess), self.userName)
         self.modAccess = modAccess
 
